@@ -821,6 +821,12 @@ mcpAddons:
     # Optional override of the default LLM instructions
     llmInstructions: ""
 
+    # Extra env vars appended verbatim to the server container — the escape
+    # hatch for server knobs the chart doesn't wire as first-class values
+    # (e.g. GPU_DIAG_NVIDIA_SMI_PATH, GPU_DIAG_TIMEOUT, GPU_DIAG_ENABLED).
+    # Appended last, so an entry can also override a chart-wired var.
+    additionalEnvVars: []
+
     nodeSelector: {}
     tolerations: []
     affinity: {}

@@ -130,6 +130,15 @@ def test_gpu_diagnostics_chart_wiring():
     assert '"get", "list", "watch", "create", "delete"' in rbac
 
 
+def test_values_support_additional_env_vars():
+    """additionalEnvVars is the escape hatch for server knobs the chart doesn't
+    wire as first-class values; appended last so entries can override
+    chart-wired vars."""
+    assert _values()["additionalEnvVars"] == []
+    text = (TEMPLATE_DIR / "deployment.yaml").read_text()
+    assert "kubernetesRemediation.additionalEnvVars" in text
+
+
 def test_docs_inline_diagnostic_egress_policy_is_valid_and_restrictive():
     """The docs page carries the diagnostic-pod egress NetworkPolicy inline, because
     the chart does not install it (NetworkPolicy is namespaced and the namespace
