@@ -124,7 +124,10 @@ def test_gpu_diagnostics_chart_wiring():
     text = (TEMPLATE_DIR / "deployment.yaml").read_text()
     assert text.count("DCGM_ENABLED") >= 2, "not wired through both ConfigMap and env"
     assert "GPU_DIAG_NAMESPACE: {{ .Release.Namespace | quote }}" in text
-    assert "pods/attach" in (TEMPLATE_DIR / "rbac.yaml").read_text()
+    rbac = (TEMPLATE_DIR / "rbac.yaml").read_text()
+    assert "pods/attach" in rbac
+    # kubectl run --rm -i also watches the pod; without it kubectl polls noisily
+    assert '"get", "list", "watch", "create", "delete"' in rbac
 
 
 def test_docs_inline_diagnostic_egress_policy_is_valid_and_restrictive():
