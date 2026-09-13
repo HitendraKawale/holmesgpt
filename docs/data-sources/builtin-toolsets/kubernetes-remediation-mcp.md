@@ -244,17 +244,14 @@ For CLI deployments, you'll need to create the RBAC resources manually. For Helm
 
 Holmes can debug GPU nodes with `run_gpu_node_diagnostics` (server >= 1.3.0): it launches a short-lived pod pinned to the node and runs the **node's own binaries** through a read-only host-filesystem mount — nvidia-smi, dmesg, lspci, journalctl; no GPU is allocated and no GPU-specific image is pulled, so it works even on fully-utilized or cordoned nodes. The caller picks checks by name only (`overview`, `details`, `throttling`, `utilization_samples`, `ecc`, `page_retirement`, `row_remapper`, `compute_processes`, `kernel_gpu_errors`, `kernel_log_journal`, `driver_info`, `pci`, `pci_link`, `fabric_manager`, `gpu_device_holders`, `process_info`, `dcgm_*`) — every command is fixed in the server, which is why the tool is auto-approved.
 
-It is **on by default** once the addon is enabled — nothing to configure. Two optional knobs:
+It is **on by default** once the addon is enabled — nothing to configure. The only optional knob is the DCGM checks:
 
 ```yaml
 mcpAddons:
   kubernetesRemediation:
     enabled: true
     config:
-      dcgmEnabled: true          # dcgm_* checks; requires dcgmi installed on the GPU hosts
-    approvalRequiredTools:       # gate the GPU tool behind a human (default: auto-approved)
-      - "run_kubectl_command"
-      - "run_gpu_node_diagnostics"
+      dcgmEnabled: true   # dcgm_* checks; requires dcgmi installed on the GPU hosts
 ```
 
 For custom nvidia-smi/dcgmi locations or other server knobs (`GPU_DIAG_NVIDIA_SMI_PATH`, `GPU_DIAG_TIMEOUT`, ...), use `additionalEnvVars`.
