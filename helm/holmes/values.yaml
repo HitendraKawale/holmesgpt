@@ -793,6 +793,8 @@ mcpAddons:
       timeout: "60"
       # Log level
       logLevel: "INFO"
+      # Enable GPU node diagnostics (run_gpu_node_diagnostics)
+      gpuDiagnosticsEnabled: false
       # Enable the dcgm_* GPU checks — requires dcgmi installed on the GPU hosts
       dcgmEnabled: false
 

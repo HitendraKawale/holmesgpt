@@ -120,8 +120,10 @@ def test_gpu_diagnostics_chart_wiring():
     in the release namespace, and the scoped ClusterRole grants pods/attach —
     kubectl run --rm -i (used by all pod-launching tools) attaches to stream
     output."""
+    assert _values()["config"]["gpuDiagnosticsEnabled"] is False  # opt-in
     assert _values()["config"]["dcgmEnabled"] is False
     text = (TEMPLATE_DIR / "deployment.yaml").read_text()
+    assert text.count("GPU_DIAG_ENABLED") >= 2, "not wired through both ConfigMap and env"
     assert text.count("DCGM_ENABLED") >= 2, "not wired through both ConfigMap and env"
     assert "GPU_DIAG_NAMESPACE: {{ .Release.Namespace | quote }}" in text
     rbac = (TEMPLATE_DIR / "rbac.yaml").read_text()
