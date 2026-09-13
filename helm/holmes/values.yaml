@@ -793,12 +793,7 @@ mcpAddons:
       timeout: "60"
       # Log level
       logLevel: "INFO"
-      # GPU node diagnostics (server >= 1.3.0): run_gpu_node_diagnostics runs
-      # the node's own binaries (nvidia-smi, dmesg, lspci, ...) via a read-only
-      # host-filesystem mount — works with no configuration. The dcgm_* checks
-      # are opt-in: enabling them asserts dcgmi (with nv-hostengine) is
-      # installed on the GPU hosts. To gate the tool behind a human, add
-      # "run_gpu_node_diagnostics" to approvalRequiredTools below.
+      # Enable the dcgm_* GPU checks — requires dcgmi installed on the GPU hosts
       dcgmEnabled: false
 
     resources:
@@ -821,10 +816,6 @@ mcpAddons:
     # Optional override of the default LLM instructions
     llmInstructions: ""
 
-    # Extra env vars appended verbatim to the server container — the escape
-    # hatch for server knobs the chart doesn't wire as first-class values
-    # (e.g. GPU_DIAG_NVIDIA_SMI_PATH, GPU_DIAG_TIMEOUT, GPU_DIAG_ENABLED).
-    # Appended last, so an entry can also override a chart-wired var.
     additionalEnvVars: []
 
     nodeSelector: {}

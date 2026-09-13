@@ -204,8 +204,6 @@ spec:
               key: token
         {{- end }}
         {{- with .Values.mcpAddons.kubernetesRemediation.additionalEnvVars }}
-        # Placed last: an entry here with a name already set above overrides it
-        # (Kubernetes uses the last occurrence of a duplicate env name).
         {{- toYaml . | nindent 8 }}
         {{- end }}
         resources:
