@@ -15,7 +15,7 @@
 # chain-of-causation evals check that a real chain is found; this one checks
 # that an unsupported one is not asserted.
 
-user_prompt: "The checkout-api in namespace app-290 is returning errors. What is the root cause?"
+user_prompt: "The checkout-api in namespace app-291 is returning errors. What is the root cause?"
 
 include_tool_calls: true
 
@@ -36,21 +36,21 @@ tags:
 setup_timeout: 300
 
 before_test: |
-  kubectl create namespace app-290 --dry-run=client -o yaml | kubectl apply -f -
+  kubectl create namespace app-291 --dry-run=client -o yaml | kubectl apply -f -
   kubectl apply -f ./manifest.yaml
 
   # inventory-api must be Ready, so that "healthy by every signal Kubernetes
   # exposes" is actually true when the agent looks.
-  kubectl wait --for=condition=available deployment/inventory-api -n app-290 --timeout=180s || {
+  kubectl wait --for=condition=available deployment/inventory-api -n app-291 --timeout=180s || {
     echo "inventory-api did not become available"
-    kubectl get pods -n app-290 -o wide
+    kubectl get pods -n app-291 -o wide
     exit 1
   }
 
   # telemetry-collector must actually be crash-looping, or the distractor is absent.
   COLLECTOR_CRASHING=false
   for i in $(seq 1 60); do
-    STATUS=$(kubectl get pod -l app=telemetry-collector -n app-290 \
+    STATUS=$(kubectl get pod -l app=telemetry-collector -n app-291 \
       -o jsonpath='{.items[0].status.containerStatuses[0].state.waiting.reason}' 2>/dev/null || true)
     if [ "$STATUS" = "CrashLoopBackOff" ]; then
       COLLECTOR_CRASHING=true
@@ -60,7 +60,7 @@ before_test: |
   done
   if [ "$COLLECTOR_CRASHING" != "true" ]; then
     echo "telemetry-collector never reached CrashLoopBackOff"
-    kubectl get pods -n app-290 -o wide
+    kubectl get pods -n app-291 -o wide
     exit 1
   fi
 
@@ -70,7 +70,7 @@ before_test: |
   SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   DEADLINE_LOGGED=false
   for i in $(seq 1 40); do
-    if kubectl logs -l app=checkout-api -n app-290 --since-time="$SINCE" --tail=100 2>/dev/null | grep -q "7k3m9x checkout failed"; then
+    if kubectl logs -l app=checkout-api -n app-291 --since-time="$SINCE" --tail=100 2>/dev/null | grep -q "7k3m9x checkout failed"; then
       DEADLINE_LOGGED=true
       break
     fi
@@ -78,9 +78,9 @@ before_test: |
   done
   if [ "$DEADLINE_LOGGED" != "true" ]; then
     echo "checkout-api never logged an upstream deadline error"
-    kubectl logs -l app=checkout-api -n app-290 --tail=50 || true
+    kubectl logs -l app=checkout-api -n app-291 --tail=50 || true
     exit 1
   fi
 
 after_test: |
-  kubectl delete namespace app-290 --ignore-not-found
+  kubectl delete namespace app-291 --ignore-not-found
